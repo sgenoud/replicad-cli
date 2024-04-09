@@ -20,7 +20,7 @@ await new Command()
   .version("v1.0.0")
   .type("fileFormat", fileFormat)
   .option("-f --filetype [filetype:fileFormat]", "The output file format")
-  .option("--project [project:boolean]", "Create a SVG pretty projection")
+  .option("--project=[project:boolean]", "Create a SVG pretty projection", {default: false})
   .arguments("<input:file> [output:file]")
   .action(async ({ filetype, project }, input, output) => {
     const text = await Deno.readTextFile(input);
