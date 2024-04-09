@@ -13,9 +13,7 @@ return main(replicad, __inputParams || dp)
   return runInContext(editedText, context);
 }
 
-async function runAsFunction(code, params) {
-  const oc = await OC;
-
+async function runAsFunction(oc, code, params) {
   return runInContextAsOC(code, {
     oc,
     replicad,
@@ -23,16 +21,16 @@ async function runAsFunction(code, params) {
   });
 }
 
-export async function runAsModule(code, params) {
+export async function runAsModule(oc, code, params) {
   const module = await buildModuleEvaluator(code);
 
   if (module.default) return module.default(params || module.defaultParams);
   return module.main(replicad, params || module.defaultParams || {});
 }
 
-export default async (code, params) => {
+export default async (oc, code, params) => {
   if (code.match(/^\s*export\s+/m)) {
-    return runAsModule(code, params);
+    return runAsModule(oc, code, params);
   }
-  return runAsFunction(code, params);
+  return runAsFunction(oc, code, params);
 };

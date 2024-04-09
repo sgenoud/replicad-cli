@@ -38,6 +38,7 @@ let OC = initOpenCascade().then((oc) => {
   return oc;
 });
 
+
 export function exportJSONMeshInfo(shapes) {
   return shapes.filter(
     ({ shape }) => !(shape instanceof replicad.Drawing) || shape.innerShape,
@@ -97,7 +98,7 @@ const buildShapesFromCode = async (code, params) => {
 
   let shapes;
   try {
-    shapes = await runCode(code, params);
+    shapes = await runCode(oc, code, params);
   } catch (e) {
     console.error(e);
 
