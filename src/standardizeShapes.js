@@ -1,3 +1,5 @@
+import normalizeColor from "./normalizeColor.js";
+
 const shapeOrSketch = (shape) => {
   if (!(shape instanceof replicad.Sketch)) return shape;
   if (shape.wire.isClosed) return shape.face();
