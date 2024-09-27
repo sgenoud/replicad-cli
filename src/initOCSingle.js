@@ -8,13 +8,9 @@ globalThis.require = (module) => {
   if (module === "path") return path;
 };
 
-
-
-
-
 export default async () => {
-  const wasmFile = import.meta.resolve("./wasm/replicad_single.wasm")
-  const wasmBinary = await fetch(wasmFile).then(r => r.arrayBuffer())
+  const wasmFile = import.meta.resolve("./wasm/replicad_single.wasm");
+  const wasmBinary = await fetch(wasmFile).then((r) => r.arrayBuffer());
 
   const OC = await opencascade({ wasmBinary });
 

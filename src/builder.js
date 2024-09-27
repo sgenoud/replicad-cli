@@ -1,4 +1,4 @@
-import * as replicad from "npm:replicad";
+import * as replicad from "npm:replicad@0.17.2";
 
 import initOpenCascade from "./initOCSingle.js";
 import standardizeShapes from "./standardizeShapes.js";
@@ -16,10 +16,14 @@ const isBlueprintLike = (shape) => {
   );
 };
 
-function findHighlightedPart(
-  { shape, highlight: inputHighlight, highlightEdge, highlightFace },
-) {
-  let highlight = inputHighlight ||
+function findHighlightedPart({
+  shape,
+  highlight: inputHighlight,
+  highlightEdge,
+  highlightFace,
+}) {
+  let highlight =
+    inputHighlight ||
     (highlightEdge && highlightEdge(new replicad.EdgeFinder())) ||
     (highlightFace && highlightFace(new replicad.FaceFinder()));
 
@@ -38,11 +42,11 @@ let OC = initOpenCascade().then((oc) => {
   return oc;
 });
 
-
 export function exportJSONMeshInfo(shapes) {
-  return shapes.filter(
-    ({ shape }) => !(shape instanceof replicad.Drawing) || shape.innerShape,
-  )
+  return shapes
+    .filter(
+      ({ shape }) => !(shape instanceof replicad.Drawing) || shape.innerShape,
+    )
     .map(
       ({
         name,
