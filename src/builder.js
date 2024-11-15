@@ -1,107 +1,32 @@
-import * as replicad from "npm:replicad@0.17.2";
+import * as replicad from "npm:replicad@0.17.3";
 
 import initOpenCascade from "./initOCSingle.js";
-import standardizeShapes from "./standardizeShapes.js";
+import {
+  standardizeOutput,
+  ShapeStandardizer,
+  renderAsJSON,
+} from "./renderOutput.ts";
 
 import runCode from "./runCode.js";
 
 self.replicad = replicad;
-
-const isBlueprintLike = (shape) => {
-  return (
-    shape instanceof replicad.Blueprint ||
-    shape instanceof replicad.Blueprints ||
-    shape instanceof replicad.CompoundBlueprint ||
-    shape instanceof replicad.Drawing
-  );
-};
-
-function findHighlightedPart({
-  shape,
-  highlight: inputHighlight,
-  highlightEdge,
-  highlightFace,
-}) {
-  let highlight =
-    inputHighlight ||
-    (highlightEdge && highlightEdge(new replicad.EdgeFinder())) ||
-    (highlightFace && highlightFace(new replicad.FaceFinder()));
-
-  if (highlight) {
-    try {
-      return highlight.find(shape).map((s) => {
-        return s.hashCode;
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  }
-}
+globalThis.registerShapeStandardizer = () => {};
 
 let OC = initOpenCascade().then((oc) => {
   return oc;
 });
-
-export function exportJSONMeshInfo(shapes) {
-  return shapes
-    .filter(
-      ({ shape }) => !(shape instanceof replicad.Drawing) || shape.innerShape,
-    )
-    .map(
-      ({
-        name,
-        shape,
-        color,
-        strokeType,
-        opacity,
-        highlight,
-        highlightEdge,
-        highlightFace,
-      }) => {
-        const shapeInfo = {
-          name,
-          color,
-          strokeType,
-          opacity,
-        };
-
-        if (isBlueprintLike(shape)) {
-          shapeInfo.format = "svg";
-          shapeInfo.paths = shape.toSVGPaths();
-          shapeInfo.viewbox = shape.toSVGViewBox();
-          return shapeInfo;
-        }
-
-        try {
-          shapeInfo.mesh = shape.mesh({ tolerance: 0.1, angularTolerance: 30 });
-          shapeInfo.edges = shape.meshEdges({ keepMesh: true });
-        } catch (e) {
-          console.error(e);
-          shapeInfo.error = true;
-          return shapeInfo;
-        }
-
-        const highlighted = findHighlightedPart({
-          shape,
-          highlight,
-          highlightEdge,
-          highlightFace,
-        });
-        if (highlighted) {
-          shapeInfo.highlight = highlighted;
-        }
-
-        return shapeInfo;
-      },
-    );
-}
 
 const buildShapesFromCode = async (code, params) => {
   const oc = await OC;
   replicad.setOC(oc);
 
   let shapes;
+  const standardizer = new ShapeStandardizer();
   try {
+    globalThis.registerShapeStandardizer =
+      standardizer.registerAdapter.bind(standardizer);
+
+    console.log("running code");
     shapes = await runCode(oc, code, params);
   } catch (e) {
     console.error(e);
@@ -115,7 +40,7 @@ const buildShapesFromCode = async (code, params) => {
     };
   }
 
-  return standardizeShapes(shapes);
+  return standardizeOutput(shapes, standardizer);
 };
 
 const buildBlob = (
@@ -161,6 +86,6 @@ export const ready = () => OC.then(() => true);
 
 export default {
   buildShapesFromCode,
-  exportJSONMeshInfo,
+  exportJSONMeshInfo: renderAsJSON,
   exportShapes,
 };

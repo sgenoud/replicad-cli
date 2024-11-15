@@ -17,7 +17,7 @@ const fileFormat = new EnumType([
 await new Command()
   .name("replicad-cli")
   .description("A basic CLI for replicad.")
-  .version("v1.0.2")
+  .version("v1.1.0")
   .type("fileFormat", fileFormat)
   .option("-f --filetype [filetype:fileFormat]", "The output file format")
   .option("--project=[project:boolean]", "Create a SVG pretty projection", {
