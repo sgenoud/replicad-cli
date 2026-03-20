@@ -1,4 +1,4 @@
-import * as replicad from "npm:replicad@0.17.3";
+import * as replicad from "npm:replicad@0.20.5";
 
 import initOpenCascade from "./initOCSingle.js";
 import {
